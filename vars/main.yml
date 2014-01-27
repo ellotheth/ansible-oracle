@@ -2,7 +2,7 @@
 
 # shell environment for the oracle user
 ora_user_env:
-  ORACLE_BASE: "{{ ora_path }}/oracle"
-  ORACLE_SID: "{{ db_name }}"
-  ORACLE_HOME: "{{ ora_path }}/oracle/product/11.2.0/{{ db_home }}"
+  ORACLE_BASE: "{{ oracle_path }}/oracle"
+  ORACLE_SID: "{{ oracle_db_name }}"
+  ORACLE_HOME: "{{ oracle_path }}/oracle/product/11.2.0/{{ oracle_db_home }}"
   NLS_LANG: "American_America.UTF8"

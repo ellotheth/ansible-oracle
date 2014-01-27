@@ -50,19 +50,19 @@
 #
 
 - include: get_installer.yml
-  when: installer1 != false
+  when: oracle_installer1 != false
   vars:
-    installer: "{{ installer1 }}"
-    checksum: "{{ checksum1 }}"
+    installer: "{{ oracle_installer1 }}"
+    checksum: "{{ oracle_checksum1 }}"
 
 - include: get_installer.yml
-  when: installer2 != false
+  when: oracle_installer2 != false
   vars:
-    installer: "{{ installer2 }}"
-    checksum: "{{ checksum2 }}"
+    installer: "{{ oracle_installer2 }}"
+    checksum: "{{ oracle_checksum2 }}"
 
 - name: make sure the installer directory exists
-  stat: path={{ install_temp }}/database
+  stat: path={{ oracle_tmp }}/database
   register: install_dir
   failed_when: not install_dir.stat.exists or not install_dir.stat.isdir
 
@@ -76,7 +76,7 @@
     state: present
     line: "127.0.0.1 {{ item }}"
   with_items:
-    - "{{ db_hostname }}"
+    - "{{ oracle_hostname }}"
     - "{{ ansible_hostname }}"
 
 - name: oracle-recommended sysctl
@@ -132,37 +132,37 @@
 - name: create initial groups for the oracle user
   group: name={{ item }} state=present
   with_items:
-    - "{{ ora_group }}"
-    - "{{ dba_group }}"
+    - "{{ oracle_group }}"
+    - "{{ oracle_dba_group }}"
 
 - name: create oracle user
   user:
-    name: "{{ ora_user }}"
-    group: "{{ ora_group }}"
-    groups: "{{ dba_group }}"
-    home: /home/{{ ora_user }}
+    name: "{{ oracle_user }}"
+    group: "{{ oracle_group }}"
+    groups: "{{ oracle_dba_group }}"
+    home: /home/{{ oracle_user }}
     shell: /bin/bash
-    password: "{{ ora_pass }}"
+    password: "{{ oracle_pass }}"
     append: yes
 
 - name: create the oracle installation path
   file:
     mode: 0755
-    path: "{{ ora_path }}"
+    path: "{{ oracle_path }}"
     state: directory
-    group: "{{ ora_group }}"
-    owner: "{{ ora_user }}"
+    group: "{{ oracle_group }}"
+    owner: "{{ oracle_user }}"
 
 - name: chown the oracle installer directory to the oracle user
   file:
-    group: "{{ ora_group }}"
-    owner: "{{ ora_user }}"
-    path: "{{ install_temp }}/database"
+    group: "{{ oracle_group }}"
+    owner: "{{ oracle_user }}"
+    path: "{{ oracle_tmp }}/database"
     state: directory
     recurse: yes
 
 - name: set oracle user environment
-  lineinfile: dest=/home/{{ ora_user }}/.bashrc state=present line="{{ item }}"
+  lineinfile: dest=/home/{{ oracle_user }}/.bashrc state=present line="{{ item }}"
   with_items:
     - "export ORACLE_BASE={{ ora_user_env.ORACLE_BASE }}"
     - "export ORACLE_SID={{ ora_user_env.ORACLE_SID }}"
@@ -182,18 +182,18 @@
 - name: compose the oracle automated installer settings
   template:
     src: db_install.rsp.j2
-    dest: "{{ install_temp }}/db_install.rsp"
-    owner: "{{ ora_user }}"
-    group: "{{ ora_group }}"
+    dest: "{{ oracle_tmp }}/db_install.rsp"
+    owner: "{{ oracle_user }}"
+    group: "{{ oracle_group }}"
 
 - name: install oracle
-  sudo_user: "{{ ora_user }}"
+  sudo_user: "{{ oracle_user }}"
   environment: ora_user_env
-  command: "{{ install_temp }}/database/runInstaller -silent -force -ignoreSysPrereqs -responseFile {{ install_temp }}/db_install.rsp"
+  command: "{{ oracle_tmp }}/database/runInstaller -silent -force -ignoreSysPrereqs -responseFile {{ oracle_tmp }}/db_install.rsp"
   when: not oracle_installed.stat.exists
 
 - name: general oracle post-installation
-  command: "{{ ora_path }}/oraInventory/orainstRoot.sh"
+  command: "{{ oracle_path }}/oraInventory/orainstRoot.sh"
   when: not oracle_installed.stat.exists
 
 - name: db-specific oracle post-installation
@@ -201,7 +201,7 @@
   when: not oracle_installed.stat.exists
 
 - name: turn off the enterprise manager web console
-  sudo_user: "{{ ora_user }}"
+  sudo_user: "{{ oracle_user }}"
   environment: ora_user_env
   command: "{{ ora_user_env.ORACLE_HOME }}/bin/emctl stop dbconsole"
   ignore_errors: yes
@@ -210,8 +210,8 @@
   lineinfile:
     dest: /etc/oratab
     state: present
-    regexp: "^{{ db_name }}"
-    line: "{{ db_name }}:{{ ora_user_env.ORACLE_HOME }}:Y"
+    regexp: "^{{ oracle_db_name }}"
+    line: "{{ oracle_db_name }}:{{ ora_user_env.ORACLE_HOME }}:Y"
 
 - name: compose the oracle init.d script
   template: src=oracle_init.j2 dest=/etc/init.d/oracle mode=0755
@@ -222,12 +222,12 @@
 - name: compose the oracle user creation script
   template:
     src: sqlplus_user_setup.sh.j2
-    dest: "{{ install_temp }}/sqlplus_user_setup.sh"
+    dest: "{{ oracle_tmp }}/sqlplus_user_setup.sh"
     mode: 0755
-    owner: "{{ ora_user }}"
-    group: "{{ ora_group }}"
+    owner: "{{ oracle_user }}"
+    group: "{{ oracle_group }}"
 
 - name: create the oracle db user
-  sudo_user: "{{ ora_user }}"
+  sudo_user: "{{ oracle_user }}"
   environment: ora_user_env
-  command: "{{ install_temp }}/sqlplus_user_setup.sh"
+  command: "{{ oracle_tmp }}/sqlplus_user_setup.sh"
