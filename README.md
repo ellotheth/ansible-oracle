@@ -32,3 +32,10 @@ commented.
       roles:
         # more roles here
         - oracle
+
+## TODO
+
+ - Handle multiple runs with different `oracle_db_home` and/or `oracle_db_name`
+   vars, instead of skipping the whole installation process.
+ - Optionally allow Oracle installer file downloads from S3 (e.g. with
+   [the s3 module](http://docs.ansible.com/s3_module.html)).
