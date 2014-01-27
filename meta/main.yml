@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: ellotheth
+  description: Oracle installation/configuration role
+  license: MIT
+  min_ansible_version: 1.4
+  platforms:
+  - name: EL
+    versions:
+    - 6
+  categories:
+  - database
+  - database:sql
+dependencies: []
