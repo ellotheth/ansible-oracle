@@ -1,0 +1,13 @@
+---
+- name: get oracle installer
+  get_url:
+    url: "{{ ora_installer_uri }}/{{ installer }}"
+    dest: "{{ install_temp }}/{{ installer }}"
+
+- name: verify installer checksum
+  command: cksum {{ install_temp }}/{{ installer }}
+  register: installer_check
+  failed_when: "installer_check.stdout.find('{{ checksum }}') != 0"
+
+- name: unzip installer
+  unarchive: src={{ install_temp }}/{{ installer }} dest={{ install_temp }}

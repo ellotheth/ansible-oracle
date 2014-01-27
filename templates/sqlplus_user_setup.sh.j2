@@ -1,0 +1,9 @@
+#!/bin/sh
+
+source /home/{{ ora_user }}/.bashrc
+
+sqlplus / as sysdba <<EOT
+CREATE USER {{ db_user }} IDENTIFIED BY {{ db_pass }};
+GRANT connect, resource TO {{ db_user }};
+exit;
+EOT
