@@ -84,6 +84,7 @@
     name: "{{ item.name }}"
     value: "{{ item.value }}"
     state: present
+    ignoreerrors: yes # Ignore errors about unknown keys
   with_items:
     - { name: "kernel.shmall", value: "2097152" }
     - { name: "kernel.shmmax", value: "1050470400" }
