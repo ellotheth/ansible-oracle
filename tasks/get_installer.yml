@@ -10,4 +10,4 @@
   failed_when: "installer_check.stdout.find('{{ checksum }}') != 0"
 
 - name: unzip installer
-  shell: unzip -d {{oracle_tmp}} {{oracle_tmp}}/{{installer}}
+  shell: unzip -o -d {{oracle_tmp}} {{oracle_tmp}}/{{installer}}
