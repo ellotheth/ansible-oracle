@@ -124,8 +124,7 @@
 - name: disable setenforce # because oracle says so, that's why
   command: /usr/sbin/setenforce 0
   register: command_result
-  ignore_errors: yes
-  #when: "'SELinux is disabled' in command_result.stderr"
+  failed_when: command_result.rc != 0 and 'SELinux is disabled' not in command_result.stderr
 
 - name: oracle-recommended selinux
   selinux: policy=targeted state=disabled
