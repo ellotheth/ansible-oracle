@@ -79,6 +79,7 @@
   with_items:
     - "{{ oracle_hostname }}"
     - "{{ ansible_hostname }}"
+    - "{{ ansible_fqdn }}"
 
 - name: oracle-recommended sysctl
   sysctl:
