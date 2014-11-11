@@ -44,6 +44,7 @@
     - sysstat
   # - pdksh # skip this because it's bad and we're getting ksh already
     - ksh
+    - libselinux-python # required by selinux ansible module
 
 #
 # unpack the oracle installers
