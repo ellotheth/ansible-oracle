@@ -14,7 +14,9 @@
 #
 
 - name: install dev tools
-  yum: name="@Development tools" state=present
+  # Yum module doesn't support skip-broken which seems required now
+  shell: 'yum groupinstall -y --skip-broken "Development tools"'
+  #yum: name="@Development tools" state=present
 
 - name: install x86 oracle dependencies
   yum: name={{ item }} state=present
